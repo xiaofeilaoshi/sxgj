@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>山西古建数字漫游 · 20处国宝级古建筑</title>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<style>
+:root{
+  --bg:#0a1020;
+  --bg2:#0d1530;
+  --gold:#d4a843;
+  --gold2:#f0c85a;
+  --gold-soft:#b8932f;
+  --ink:#0a1020;
+  --paper:#f4ecd6;
+  --seal:#b22222;
+  --text:#e8dcc0;
+  --muted:#9a8e6e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:transparent;color:var(--text);font-family:"KaiTi","STKaiti","楷体",serif;overflow-x:hidden;position:relative;z-index:1}
+body{min-height:100vh;
+  background:
+    radial-gradient(1200px 700px at 70% -10%, rgba(212,168,67,.10), transparent 60%),
+    radial-gradient(900px 600px at 10% 110%, rgba(120,90,40,.08), transparent 60%),
+    linear-gradient(180deg,#070c1a 0%,#0a1020 50%,#080d1c 100%);
+}
+/* 顶部标题区 */
+.hero{
+  text-align:center;
+  padding:56px 20px 36px;
+  position:relative;
+}
+.hero .kicker{
+  font-family:"ZCOOL XiaoWei","Songti SC","SimSun",serif;
+  letter-spacing:.5em;
+  font-size:14px;
+  color:var(--gold-soft);
+  margin-bottom:14px;
+}
+.hero h1{
+  font-family:"Ma Shan Zheng","KaiTi",serif;
+  font-size:64px;
+  color:var(--gold2);
+  letter-spacing:.25em;
+  text-shadow:0 0 30px rgba(212,168,67,.25), 0 2px 0 rgba(0,0,0,.4);
+  margin-bottom:10px;
+}
+.hero .sub{
+  font-size:18px;
+  color:var(--muted);
+  letter-spacing:.3em;
+}
+.hero .seal{
+  display:inline-block;
+  width:64px;height:64px;
+  background:var(--seal);
+  color:#fff;
+  font-family:"Ma Shan Zheng","KaiTi","STKaiti","楷体",serif;
+  font-size:22px;
+  line-height:1.05;
+  border-radius:8px;
+  padding:6px 4px;
+  margin-top:18px;
+  box-shadow:0 0 0 2px #8b1a1a, 0 4px 14px rgba(0,0,0,.4);
+  transform:rotate(-6deg);
+  letter-spacing:0;
+}
+/* 统计条 */
+.stats-row{
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  padding:24px 20px 8px;
+  flex-wrap:wrap;
+}
+.stat{
+  text-align:center;
+}
+.stat .num{
+  font-family:"Ma Shan Zheng","KaiTi","STKaiti","楷体",serif;
+  font-size:42px;
+  color:var(--gold2);
+  line-height:1;
+}
+.stat .lbl{
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:.2em;
+  margin-top:6px;
+}
+/* 主体：地图+列表 */
+.main{
+  max-width:1400px;
+  margin:0 auto;
+  padding:30px 24px 60px;
+  display:grid;
+  grid-template-columns: 1fr 420px;
+  gap:32px;
+}
+@media(max-width:1100px){.main{grid-template-columns:1fr}}
+/* 地图卡片 */
+.card{
+  background:linear-gradient(180deg,rgba(13,21,48,.85),rgba(8,13,28,.9));
+  border:1px solid rgba(212,168,67,.25);
+  border-radius:6px;
+  padding:24px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5), inset 0 0 60px rgba(212,168,67,.03);
+  position:relative;
+}
+.card::before{
+  content:"";position:absolute;top:8px;left:8px;right:8px;bottom:8px;
+  border:1px solid rgba(212,168,67,.12);border-radius:3px;pointer-events:none;
+}
+.card h2{
+  font-family:"Ma Shan Zheng","KaiTi","STKaiti","楷体",serif;
+  font-size:26px;
+  color:var(--gold2);
+  letter-spacing:.15em;
+  margin-bottom:4px;
+  display:flex;align-items:center;gap:12px;
+}
+.card h2::before{
+  content:"";width:4px;height:24px;background:linear-gradient(var(--gold2),var(--gold-soft));border-radius:2px;
+}
+.card .tag{
+  font-size:12px;color:var(--muted);letter-spacing:.3em;margin-bottom:16px;
+}
+.map-wrap{position:relative;width:100%;}
+.map-wrap svg{width:100%;height:auto;display:block}
+.city-poly{
+  fill:rgba(212,168,67,.05);
+  stroke:rgba(212,168,67,.35);
+  stroke-width:1.2;
+  transition:fill .3s;
+}
+.city-poly:hover{fill:rgba(212,168,67,.18);stroke:var(--gold2)}
+.city-label{
+  fill:var(--muted);font-size:13px;font-family:"KaiTi",serif;
+  pointer-events:none;text-anchor:middle;
+}
+.marker{cursor:pointer}
+.marker .dot{
+  fill:var(--gold2);
+  filter:drop-shadow(0 0 6px rgba(240,200,90,.9));
+  transform-origin:center;
+  transform-box:fill-box;
+}
+.marker .ring{
+  fill:none;stroke:var(--gold2);stroke-width:1.5;
+  transform-origin:center;transform-box:fill-box;
+  animation:pulse 2.4s ease-out infinite;
+  opacity:.8;
+}
+.marker:hover .dot{r:7}
+.marker:hover .ring{animation-duration:1.2s}
+@keyframes pulse{
+  0%{transform:scale(.4);opacity:.9}
+  100%{transform:scale(2.6);opacity:0}
+}
+.tooltip{
+  position:absolute;pointer-events:none;
+  background:rgba(10,16,32,.96);
+  border:1px solid var(--gold);
+  color:var(--text);
+  padding:8px 12px;
+  font-size:13px;
+  border-radius:4px;
+  transform:translate(-50%,-120%);
+  white-space:nowrap;
+  opacity:0;transition:opacity .15s;
+  z-index:10;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+}
+.tooltip .tt-name{color:var(--gold2);font-size:15px;margin-bottom:2px}
+.tooltip .tt-city{color:var(--muted);font-size:11px}
+/* 列表 */
+.list{max-height:760px;overflow-y:auto;padding-right:6px}
+.list::-webkit-scrollbar{width:6px}
+.list::-webkit-scrollbar-thumb{background:rgba(212,168,67,.3);border-radius:3px}
+.city-group{margin-bottom:18px}
+.city-group h3{
+  font-size:16px;color:var(--gold);letter-spacing:.2em;
+  border-bottom:1px solid rgba(212,168,67,.2);
+  padding-bottom:6px;margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.city-group h3 .cnt{font-size:12px;color:var(--muted);letter-spacing:0}
+.building-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background .2s;
+  text-decoration:none;color:var(--text);
+}
+.building-item:hover{background:rgba(212,168,67,.1)}
+.building-item .num{
+  width:26px;height:26px;border:1px solid var(--gold-soft);
+  color:var(--gold2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+}
+.building-item .meta{flex:1;min-width:0}
+.building-item .bname{font-size:15px;color:var(--gold2)}
+.building-item .bdesc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.building-item .arrow{color:var(--muted);font-size:14px}
+.building-item:hover .arrow{color:var(--gold2)}
+/* 图表区 */
+.charts{
+  max-width:1400px;margin:0 auto;padding:0 24px 80px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;
+}
+@media(max-width:1100px){.charts{grid-template-columns:1fr}}
+.chart-card h3{
+  font-family:"Ma Shan Zheng","KaiTi","STKaiti","楷体",serif;
+  font-size:18px;color:var(--gold2);letter-spacing:.15em;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.chart-card h3 .en{font-size:11px;color:var(--muted);letter-spacing:.2em;font-family:serif}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-row .bl{width:70px;font-size:13px;color:var(--muted);text-align:right;flex-shrink:0}
+.bar-row .bt{flex:1;height:16px;background:rgba(212,168,67,.08);border-radius:2px;overflow:hidden;position:relative}
+.bar-row .bf{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold-soft),var(--gold2));
+  border-radius:2px;
+  box-shadow:0 0 8px rgba(240,200,90,.4);
+  width:0;transition:width 1s ease;
+}
+.bar-row .bv{width:36px;font-size:12px;color:var(--gold2);text-align:left}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.legend .lg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.legend .sw{width:12px;height:12px;border-radius:2px}
+/* 时间轴 */
+.timeline{position:relative;padding-left:20px}
+.timeline::before{
+  content:"";position:absolute;left:6px;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--gold-soft),rgba(212,168,67,.1));
+}
+.tl-item{position:relative;padding-bottom:12px}
+.tl-item::before{
+  content:"";position:absolute;left:-18px;top:6px;width:10px;height:10px;
+  background:var(--gold2);border-radius:50%;box-shadow:0 0 8px var(--gold2);
+}
+.tl-item .yr{font-size:14px;color:var(--gold2);font-weight:bold}
+.tl-item .ev{font-size:12px;color:var(--muted);margin-top:2px}
+footer{
+  text-align:center;padding:30px 20px 50px;
+  color:var(--muted);font-size:12px;letter-spacing:.2em;
+  border-top:1px solid rgba(212,168,67,.12);
+}
+footer .gold{color:var(--gold-soft)}
+/* ==================== 大气升级：三晋建筑纹样 & 光感 ==================== */
+/* 窗棂纹样（默认）—— 明显的方格回纹 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1000px 520px at 50% 0%, rgba(212,168,67,.16), transparent 62%),
+    radial-gradient(760px 460px at 85% 88%, rgba(165,57,47,.13), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg stroke='%23d4a843' stroke-width='1.1' opacity='.20' fill='none'%3E%3Crect x='12' y='12' width='72' height='72'/%3E%3Crect x='24' y='24' width='48' height='48'/%3E%3Cpath d='M12 48h72M48 12v72'/%3E%3Cpath d='M0 0l24 24M96 0L72 24M0 96l24 72M96 96L72 72' opacity='.14'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:auto, auto, 96px 96px;
+  opacity:.42;
+  transition:opacity .4s, background-image .4s;
+}
+/* 斗拱纹样 —— 大尺度斗拱层叠轮廓，切换时一眼认出 */
+body[data-pattern="dougong"]::before{
+  background-image:
+    radial-gradient(1000px 520px at 50% 0%, rgba(212,168,67,.16), transparent 62%),
+    radial-gradient(760px 460px at 85% 88%, rgba(165,57,47,.13), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='140'%3E%3Cg stroke='%23d4a843' stroke-width='1.3' opacity='.24' fill='none'%3E%3Cpath d='M0 30h200M0 30v20h200v-20' stroke-width='1.6'/%3E%3Cpath d='M20 30V10h40v20M80 30V0h50v30M140 30V12h40v18'/%3E%3Cpath d='M0 70h200' stroke-width='1.8'/%3E%3Cpath d='M14 70v30M48 70v30M82 70v30M116 70v30M150 70v30M184 70v30'/%3E%3Crect x='10' y='75' width='180' height='8' fill='%23d4a843' opacity='.10' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:auto, auto, 200px 140px;
+}
+/* 素色 —— 只有径向光，完全去掉 SVG 纹样 */
+body[data-pattern="plain"]::before{
+  background-image:
+    radial-gradient(1000px 520px at 50% 0%, rgba(212,168,67,.16), transparent 62%),
+    radial-gradient(760px 460px at 85% 88%, rgba(165,57,47,.13), transparent 60%);
+  background-size:auto, auto;
+  opacity:1;
+}
+/* 顶部回纹装饰带 */
+.hero::before{
+  content:"";position:absolute;left:50%;top:18px;transform:translateX(-50%);
+  width:min(880px,88%);height:26px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='26' viewBox='0 0 120 26'%3E%3Cg fill='none' stroke='%23c9a24a' stroke-width='1.2' opacity='.55'%3E%3Cpath d='M0 13h14V5h12v16H6M30 13h18V7h10v12h-6M60 13h16V5h14v16h-8M96 13h24'/%3E%3C/g%3E%3C/svg%3E") repeat-x center / 120px 26px;
+  opacity:.75;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);
+}
+/* 主标题更有层次 */
+.hero h1{
+  font-size:clamp(42px,7vw,86px);
+  background:linear-gradient(180deg,#fff3d0 0%,#f0c85a 42%,#b8932f 78%,#f7e6b5 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  text-shadow:none;
+  filter:drop-shadow(0 0 26px rgba(240,200,90,.35)) drop-shadow(0 3px 2px rgba(0,0,0,.55));
+  animation:titleGlow 5.5s ease-in-out infinite;
+}
+.hero h1::after{
+  content:"";display:block;height:2px;margin:16px auto 0;width:min(520px,72%);
+  background:linear-gradient(90deg,transparent,rgba(240,200,90,.85),transparent);
+  filter:blur(.3px);
+}
+@keyframes titleGlow{
+  0%,100%{filter:drop-shadow(0 0 22px rgba(240,200,90,.30)) drop-shadow(0 3px 2px rgba(0,0,0,.55))}
+  50%{filter:drop-shadow(0 0 40px rgba(255,225,140,.62)) drop-shadow(0 3px 2px rgba(0,0,0,.55))}
+}
+.hero .sub{font-size:clamp(14px,1.5vw,19px);color:#c8b98f}
+/* 统计数字光感 */
+.stat .num{
+  background:linear-gradient(180deg,#fff6da,#f0c85a 55%,#c9a24a);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(240,200,90,.45));
+  animation:numPulse 3.6s ease-in-out infinite;
+}
+.stat:nth-child(2) .num{animation-delay:.4s}
+.stat:nth-child(3) .num{animation-delay:.8s}
+.stat:nth-child(4) .num{animation-delay:1.2s}
+@keyframes numPulse{0%,100%{filter:drop-shadow(0 0 10px rgba(240,200,90,.32))}50%{filter:drop-shadow(0 0 22px rgba(255,228,150,.78))}}
+/* 卡片：顶部光边 + 内光晕 + hover 流光 */
+.card{transition:box-shadow .45s,border-color .45s}
+.card::after{
+  content:"";position:absolute;left:0;top:0;right:0;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(240,200,90,.9),rgba(255,255,255,.55),rgba(240,200,90,.9),transparent);
+  opacity:.65;
+  animation:edgeSlide 6s linear infinite;
+  background-size:220% 100%;
+}
+@keyframes edgeSlide{0%{background-position:-100% 0}100%{background-position:200% 0}}
+.card:hover{border-color:rgba(240,200,90,.5);box-shadow:0 12px 48px rgba(0,0,0,.55),0 0 40px rgba(212,168,67,.14)}
+/* 卡片四角回形装饰 */
+.card h2 .corner{display:inline-block}
+/* 条形图流光 */
+.bar-row .bt{position:relative;overflow:hidden}
+.bar-row .bt::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);
+  transform:translateX(-120%);
+  animation:barSweep 3.4s ease-in-out infinite;
+  pointer-events:none;
+}
+.bar-row:nth-child(2n) .bt::after{animation-delay:.7s}
+.bar-row:nth-child(3n) .bt::after{animation-delay:1.4s}
+@keyframes barSweep{0%{transform:translateX(-120%)}55%,100%{transform:translateX(220%)}}
+.bar-row .bf{box-shadow:0 0 12px rgba(240,200,90,.55),inset 0 0 8px rgba(255,255,255,.25)}
+/* 环图光晕脉动 */
+#typeDonut{filter:drop-shadow(0 0 16px rgba(212,168,67,.28));animation:donutGlow 4.2s ease-in-out infinite}
+@keyframes donutGlow{
+  0%,100%{filter:drop-shadow(0 0 14px rgba(212,168,67,.22))}
+  50%{filter:drop-shadow(0 0 30px rgba(240,200,90,.55))}
+}
+#typeDonut path{transition:opacity .3s,transform .3s}
+#typeDonut path:hover{opacity:1}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+/* 图例光点 */
+.legend .sw{box-shadow:0 0 10px currentColor}
+/* 背景纹样切换控件 */
+.pattern-switch{
+  position:fixed;right:22px;bottom:22px;z-index:30;
+  display:flex;gap:8px;align-items:center;
+  padding:8px 10px;border:1px solid rgba(212,168,67,.3);border-radius:999px;
+  background:rgba(10,16,32,.82);backdrop-filter:blur(10px);
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
+}
+.pattern-switch span{font-size:11px;color:var(--muted);letter-spacing:.16em;margin-right:2px}
+.pattern-switch button{
+  font-family:inherit;font-size:12px;letter-spacing:.1em;cursor:pointer;
+  padding:5px 13px;border-radius:999px;border:1px solid rgba(212,168,67,.3);
+  background:transparent;color:#c8b98f;transition:.25s;
+}
+.pattern-switch button:hover{color:#f0c85a;border-color:rgba(240,200,90,.6)}
+.pattern-switch button.on{
+  color:#0a1020;background:linear-gradient(180deg,#f0c85a,#c9a24a);
+  border-color:#f0c85a;box-shadow:0 0 16px rgba(240,200,90,.5);
+  font-weight:bold;
+}
+/* ==================== 盲盒拆拆乐模块 ==================== */
+.blindbox{
+  max-width:1400px;margin:0 auto;padding:0 24px 80px;
+}
+.blindbox .bb-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-bottom:22px;
+}
+.blindbox .bb-title{
+  font-family:"Ma Shan Zheng","KaiTi","STKaiti","楷体",serif;font-size:26px;color:var(--gold2);letter-spacing:.18em;
+  display:flex;align-items:center;gap:12px;
+}
+.blindbox .bb-title .en{font-size:11px;color:var(--muted);letter-spacing:.25em;font-family:serif}
+.blindbox .bb-bar{display:flex;align-items:center;gap:12px}
+.blindbox .bb-progress{
+  font-size:13px;color:var(--text);
+  background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.25);
+  border-radius:999px;padding:6px 18px;letter-spacing:.06em;
+}
+.blindbox .bb-progress b{color:var(--gold2);font-size:16px;margin:0 2px}
+.blindbox .bb-progress.done b{animation:bb-pulse .6s ease 2;color:var(--gold2)}
+@keyframes bb-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.blindbox .bb-reset{
+  font-size:12px;border:1px solid rgba(212,168,67,.35);background:transparent;color:var(--muted);
+  border-radius:999px;padding:6px 16px;cursor:pointer;transition:.2s;letter-spacing:.08em;
+  text-decoration:none;display:inline-block;font-family:inherit;
+}
+.blindbox .bb-reset:hover{color:var(--gold2);border-color:var(--gold2)}
+.bb-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:18px;
+}
+@media(max-width:1100px){.bb-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:780px){.bb-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.bb-grid{grid-template-columns:repeat(2,1fr)}}
+.bb-card{position:relative;cursor:pointer;user-select:none}
+.bb-inner{
+  position:relative;aspect-ratio:3/4.1;border-radius:14px;
+  background:linear-gradient(180deg,rgba(30,40,70,.7),rgba(14,22,44,.85));
+  border:1px solid rgba(212,168,67,.22);
+  box-shadow:0 4px 18px rgba(0,0,0,.4), inset 0 0 24px rgba(212,168,67,.04);
+  overflow:hidden;transition:transform .25s, box-shadow .25s;
+}
+.bb-card:not(.opened):hover .bb-inner{
+  transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 22px rgba(212,168,67,.15);
+}
+.bb-box{
+  position:absolute;left:14%;right:14%;top:30%;bottom:22%;border-radius:10px 10px 8px 8px;
+  background:linear-gradient(160deg,var(--c1),var(--c2));
+  box-shadow:inset 0 -14px 24px rgba(0,0,0,.22),inset 0 4px 10px rgba(255,255,255,.22);
+}
+.bb-box::before{content:"";position:absolute;left:calc(50% - 8px);top:0;bottom:0;width:16px;
+  background:linear-gradient(90deg,rgba(255,255,255,.22),rgba(255,255,255,.5),rgba(255,255,255,.22))}
+.bb-box::after{content:"";position:absolute;top:26%;left:0;right:0;height:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.45),rgba(255,255,255,.22))}
+.bb-lid{
+  position:absolute;left:10%;right:10%;top:21%;height:13%;border-radius:8px;
+  background:linear-gradient(160deg,var(--c2),var(--c1));box-shadow:0 4px 10px rgba(0,0,0,.25);
+  z-index:3;transition:transform .5s cubic-bezier(.34,1.3,.5,1),opacity .5s;
+}
+.bb-lid::before{content:"";position:absolute;left:calc(50% - 8px);top:0;bottom:0;width:16px;
+  background:rgba(255,255,255,.45);border-radius:3px}
+.bb-bow{position:absolute;left:50%;top:-46%;transform:translateX(-50%);width:28px;height:15px;z-index:4}
+.bb-bow::before,.bb-bow::after{content:"";position:absolute;top:0;width:13px;height:13px;border-radius:50% 50% 50% 0;
+  background:var(--gold2);box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.bb-bow::before{left:0;transform:rotate(-35deg)}
+.bb-bow::after{right:0;transform:rotate(35deg) scaleX(-1)}
+.bb-q{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);z-index:2;
+  font-size:38px;font-weight:800;color:rgba(255,255,255,.92);text-shadow:0 3px 8px rgba(0,0,0,.35);transition:opacity .3s}
+.bb-num{position:absolute;left:8px;top:8px;z-index:5;font-size:10px;font-weight:700;color:#fff;
+  background:var(--c1);border-radius:5px;padding:2px 7px;letter-spacing:.05em}
+.bb-tag{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);background:rgba(10,16,32,.85);
+  border:1px solid rgba(212,168,67,.3);border-radius:999px;font-size:11px;padding:3px 11px;white-space:nowrap;
+  color:var(--text);z-index:5;transition:.3s}
+.bb-char{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);width:78%;height:auto;z-index:6;cursor:pointer;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.5));transition:transform .2s}
+.bb-char:hover{transform:translate(-50%,-50%) scale(1.06)}
+.bb-glow{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:120%;aspect-ratio:1;border-radius:50%;z-index:1;
+  background:radial-gradient(circle,rgba(255,224,130,.5),rgba(255,224,130,0) 65%);opacity:0;transition:opacity .5s}
+.bb-hint{position:absolute;left:0;right:0;bottom:6%;z-index:7;text-align:center;font-size:10px;color:var(--gold2);
+  opacity:0;transition:opacity .4s;letter-spacing:.05em}
+.bb-card.opened .bb-q{opacity:0}
+.bb-card.opened .bb-glow{opacity:1}
+.bb-card.opened .bb-hint{opacity:1}
+.bb-card.opened .bb-tag{background:var(--c1);color:#fff;border-color:transparent}
+.bb-card.shaking .bb-inner{animation:bb-shake .5s ease}
+@keyframes bb-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-4deg)}40%{transform:rotate(4deg)}60%{transform:rotate(-3deg)}80%{transform:rotate(3deg)}}
+.bb-card.opening .bb-lid{transform:translateY(-80px) rotate(24deg);opacity:0}
+.bb-card.opening .bb-box{transform:translateY(40px) scale(.85);opacity:0;transition:transform .5s,opacity .5s}
+.bb-card.pop .bb-char{animation:bb-pop .65s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes bb-pop{0%{transform:translate(-50%,10%) scale(.2)}70%{transform:translate(-50%,-56%) scale(1.08)}100%{transform:translate(-50%,-50%) scale(1)}}
+.bb-confetti{position:absolute;width:7px;height:7px;z-index:9;pointer-events:none;border-radius:2px;opacity:1;animation:bb-burst 1s ease-out forwards}
+@keyframes bb-burst{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="kicker">SHANXI · ANCIENT ARCHITECTURE · DIGITAL ROAMING</div>
+  <h1>山西古建 · 数字漫游</h1>
+  <div class="sub">二十处国宝级古建筑 · 三维沉浸式漫游</div>
+  <div class="seal">山<br>西</div>
+</section>
+
+<div class="stats-row" id="statsRow"></div>
+
+<section class="main">
+  <div class="card">
+    <h2>山西省古建分布图</h2>
+    <div class="tag">SHANXI MAP · CLICK MARKER TO ENTER</div>
+    <div class="map-wrap" id="mapWrap">
+      <svg id="map" viewBox="0 0 760 1330" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>古建名录</h2>
+    <div class="tag">20 SITES · BY CITY</div>
+    <div class="list" id="list"></div>
+  </div>
+</section>
+
+<section class="charts">
+  <div class="card chart-card">
+    <h3>朝代分布 <span class="en">DYNASTY</span></h3>
+    <div id="dynastyChart"></div>
+  </div>
+  <div class="card chart-card">
+    <h3>建筑类型 <span class="en">TYPE</span></h3>
+    <svg id="typeDonut" viewBox="0 0 200 200" style="width:100%;height:220px"></svg>
+    <div class="legend" id="typeLegend"></div>
+  </div>
+  <div class="card chart-card">
+    <h3>地市分布 <span class="en">CITY</span></h3>
+    <div id="cityChart"></div>
+  </div>
+</section>
+
+<section class="blindbox">
+  <div class="bb-head">
+    <div class="bb-title">盲盒拆拆乐 <span class="en">BLIND BOX</span></div>
+    <div class="bb-bar">
+      <div class="bb-progress" id="bbProgress">已拆开 <b id="bbCnt">0</b> / 20 款</div>
+      <button class="bb-reset" id="bbReset">重新盖盒</button>
+      <a class="bb-reset" href="model3d.html">3D 形象预览</a>
+    </div>
+  </div>
+  <div class="bb-grid" id="bbGrid"></div>
+</section>
+
+<footer>
+  山西省古建筑三维数字化漫游系统 &nbsp;·&nbsp; <span class="gold">地上文物看山西</span> &nbsp;·&nbsp; 数字媒体作品
+</footer>
+
+<div class="pattern-switch" id="patternSwitch">
+  <span>纹样</span>
+  <button data-p="ling" class="on">窗棂</button>
+  <button data-p="dougong">斗拱</button>
+  <button data-p="plain">素色</button>
+</div>
+
+<script src="assets/shanxi-geo.js"></script>
+<script src="assets/buildings-data.js"></script>
+<script>
+(function(){
+  const G = window.SHANXI_GEO;
+  const S = window.SXGJ;
+  const ids = Object.keys(S);
+
+  // ---- 统计 ----
+  const cities = new Set(ids.map(id=>S[id].city));
+  // 朝代抽取
+  function dynastyOf(id){
+    const eb = S[id].eyebrow;
+    const m = eb.match(/(北魏|北齐|五代|隋|唐|宋|辽|金|元|明|清|汉)/);
+    return m ? m[1] : '古';
+  }
+  const dynasties = [...new Set(ids.map(dynastyOf))];
+  document.getElementById('statsRow').innerHTML = [
+    {num:ids.length,lbl:'处古建'},
+    {num:cities.size,lbl:'地市'},
+    {num:dynasties.length,lbl:'跨越朝代'},
+    {num:'1500+',lbl:'年历史'}
+  ].map(s=>`<div class="stat"><div class="num">${s.num}</div><div class="lbl">${s.lbl}</div></div>`).join('');
+
+  // ---- 地图 ----
+  const svg = document.getElementById('map');
+  const NS = 'http://www.w3.org/2000/svg';
+  // 城市多边形
+  G.cities.forEach(c=>{
+    c.paths.forEach(ring=>{
+      ring.forEach(poly=>{
+        const d = poly.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')+' Z';
+        const path = document.createElementNS(NS,'path');
+        path.setAttribute('d',d);
+        path.setAttribute('class','city-poly');
+        svg.appendChild(path);
+      });
+    });
+    // 城市名
+    if(c.center){
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x',c.center[0]);
+      t.setAttribute('y',c.center[1]);
+      t.setAttribute('class','city-label');
+      t.textContent = c.name.replace('市','');
+      svg.appendChild(t);
+    }
+  });
+
+  // ---- 标记（同城错位）----
+  // 按城市分组
+  const byCity = {};
+  ids.forEach(id=>{ const c=S[id].city; (byCity[c]=byCity[c]||[]).push(id); });
+  // 错位偏移
+  const offsets = [[0,0],[14,-10],[-14,-10],[0,14],[14,10],[-14,10],[0,-16]];
+  Object.keys(byCity).forEach(city=>{
+    byCity[city].forEach((id,idx)=>{
+      const b = S[id];
+      const [x,y] = window.sxProject(b.lon, b.lat);
+      const off = offsets[idx] || [idx*8-12, idx*8];
+      const mx = x + off[0], my = y + off[1];
+      const g = document.createElementNS(NS,'g');
+      g.setAttribute('class','marker');
+      g.setAttribute('transform',`translate(${mx.toFixed(1)},${my.toFixed(1)})`);
+      g.innerHTML = `<circle class="ring" r="5"/><circle class="dot" r="4.5"/>`;
+      g.addEventListener('click',()=>location.href = id+'.html');
+      g.addEventListener('mouseenter',e=>showTip(e,b));
+      g.addEventListener('mousemove',e=>moveTip(e));
+      g.addEventListener('mouseleave',hideTip);
+      svg.appendChild(g);
+    });
+  });
+
+  const tip = document.getElementById('tooltip');
+  const mapWrap = document.getElementById('mapWrap');
+  function showTip(e,b){
+    tip.innerHTML = `<div class="tt-name">${b.name}</div><div class="tt-city">${b.city} · ${b.eyebrow.split('·')[1]||''}</div>`;
+    tip.style.opacity = 1;
+    moveTip(e);
+  }
+  function moveTip(e){
+    const r = mapWrap.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left) + 'px';
+    tip.style.top = (e.clientY - r.top) + 'px';
+  }
+  function hideTip(){ tip.style.opacity = 0; }
+
+  // ---- 名录列表 ----
+  const list = document.getElementById('list');
+  const cityOrder = Object.keys(byCity).sort((a,b)=>byCity[b].length-byCity[a].length);
+  cityOrder.forEach(city=>{
+    const group = document.createElement('div');
+    group.className = 'city-group';
+    group.innerHTML = `<h3>${city}<span class="cnt">${byCity[city].length} 处</span></h3>`;
+    byCity[city].forEach((id,i)=>{
+      const b = S[id];
+      const a = document.createElement('a');
+      a.className = 'building-item';
+      a.href = id+'.html';
+      a.innerHTML = `<div class="num">${i+1}</div>
+        <div class="meta"><div class="bname">${b.name}</div>
+        <div class="bdesc">${b.subtitle}</div></div>
+        <div class="arrow">›</div>`;
+      group.appendChild(a);
+    });
+    list.appendChild(group);
+  });
+
+  // ---- 朝代条形图 ----
+  const dOrder = ['北魏','北齐','五代','隋','唐','宋','辽','金','元','明','清'];
+  const dCount = {};
+  ids.forEach(id=>{ const d=dynastyOf(id); dCount[d]=(dCount[d]||0)+1; });
+  const dynMax = Math.max(...Object.values(dCount));
+  const dc = document.getElementById('dynastyChart');
+  dc.innerHTML = dOrder.filter(d=>dCount[d]).map(d=>`
+    <div class="bar-row">
+      <div class="bl">${d}</div>
+      <div class="bt"><div class="bf" data-w="${(dCount[d]/dynMax*100).toFixed(0)}"></div></div>
+      <div class="bv">${dCount[d]}</div>
+    </div>`).join('');
+  setTimeout(()=>dc.querySelectorAll('.bf').forEach(b=>b.style.width=b.dataset.w+'%'),100);
+
+  // ---- 类型环图 ----
+  const typeMap = {pagoda:'楼阁塔',pavilion:'楼阁',cliff:'悬空',grotto:'石窟',courtyard:'殿堂院落',citywall:'城垣',museum:'现代馆'};
+  const typeColor = {pagoda:'#d4a843',pavilion:'#c97b3a',cliff:'#8b6f47',grotto:'#a08550',courtyard:'#b8932f',citywall:'#6b8e6b',museum:'#7a8aa8'};
+  const tCount = {};
+  ids.forEach(id=>{ const t=S[id].arch; tCount[t]=(tCount[t]||0)+1; });
+  const tKeys = Object.keys(tCount);
+  const total = ids.length;
+  const donut = document.getElementById('typeDonut');
+  let acc = 0;
+  tKeys.forEach(k=>{
+    const frac = tCount[k]/total;
+    const start = acc, end = acc + frac;
+    acc = end;
+    const large = frac>0.5?1:0;
+    const x1=100+90*Math.cos(2*Math.PI*start - Math.PI/2);
+    const y1=100+90*Math.sin(2*Math.PI*start - Math.PI/2);
+    const x2=100+90*Math.cos(2*Math.PI*end - Math.PI/2);
+    const y2=100+90*Math.sin(2*Math.PI*end - Math.PI/2);
+    const path = document.createElementNS(NS,'path');
+    path.setAttribute('d',`M100,100 L${x1},${y1} A90,90 0 ${large},1 ${x2},${y2} Z`);
+    path.setAttribute('fill',typeColor[k]);
+    path.setAttribute('opacity','.85');
+    donut.appendChild(path);
+  });
+  // 中心圆
+  const c = document.createElementNS(NS,'circle');
+  c.setAttribute('cx',100);c.setAttribute('cy',100);c.setAttribute('r',46);
+  c.setAttribute('fill','#0d1530');
+  donut.appendChild(c);
+  const ct = document.createElementNS(NS,'text');
+  ct.setAttribute('x',100);ct.setAttribute('y',96);ct.setAttribute('text-anchor','middle');
+  ct.setAttribute('fill','#d4a843');ct.setAttribute('font-size','13');
+  ct.setAttribute('font-family','KaiTi,serif');
+  ct.textContent = '建筑类型';
+  donut.appendChild(ct);
+  const ct2 = document.createElementNS(NS,'text');
+  ct2.setAttribute('x',100);ct2.setAttribute('y',116);ct2.setAttribute('text-anchor','middle');
+  ct2.setAttribute('fill','#f0c85a');ct2.setAttribute('font-size','22');
+  ct2.setAttribute('font-family','Ma Shan Zheng,serif');
+  ct2.textContent = total+' 处';
+  donut.appendChild(ct2);
+  // 旋转光弧（动感）
+  const glowRing = document.createElementNS(NS,'circle');
+  glowRing.setAttribute('cx',100);glowRing.setAttribute('cy',100);glowRing.setAttribute('r',93);
+  glowRing.setAttribute('fill','none');
+  glowRing.setAttribute('stroke','rgba(240,200,90,.75)');
+  glowRing.setAttribute('stroke-width','2');
+  glowRing.setAttribute('stroke-dasharray','30 285');
+  glowRing.setAttribute('stroke-linecap','round');
+  glowRing.style.transformOrigin='100px 100px';
+  glowRing.style.animation='ringSpin 8s linear infinite';
+  donut.appendChild(glowRing);
+  const glowRing2 = glowRing.cloneNode();
+  glowRing2.setAttribute('r',97);
+  glowRing2.setAttribute('stroke','rgba(255,255,255,.4)');
+  glowRing2.setAttribute('stroke-width','1');
+  glowRing2.setAttribute('stroke-dasharray','14 300');
+  glowRing2.style.animation='ringSpin 5s linear infinite reverse';
+  donut.appendChild(glowRing2);
+  // 图例
+  document.getElementById('typeLegend').innerHTML = tKeys.map(k=>
+    `<div class="lg"><span class="sw" style="background:${typeColor[k]}"></span>${typeMap[k]||k} ${tCount[k]}</div>`
+  ).join('');
+
+  // ---- 地市条形图 ----
+  const cityCount = {};
+  ids.forEach(id=>{ cityCount[S[id].city]=(cityCount[S[id].city]||0)+1; });
+  const citySorted = Object.entries(cityCount).sort((a,b)=>b[1]-a[1]);
+  const cMax = citySorted[0][1];
+  document.getElementById('cityChart').innerHTML = citySorted.map(([c,n])=>`
+    <div class="bar-row">
+      <div class="bl">${c}</div>
+      <div class="bt"><div class="bf" data-w="${(n/cMax*100).toFixed(0)}"></div></div>
+      <div class="bv">${n}</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('#cityChart .bf').forEach(b=>b.style.width=b.dataset.w+'%'),100);
+
+  // ---- 背景纹样切换 ----
+  document.body.setAttribute('data-pattern','ling');
+  document.querySelectorAll('#patternSwitch button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#patternSwitch button').forEach(x=>x.classList.remove('on'));
+      btn.classList.add('on');
+      document.body.setAttribute('data-pattern', btn.dataset.p);
+    });
+  });
+
+  // ---- 盲盒拆拆乐 ----
+  const BOX_ORDER = ['yxmt','jxxsl','xks','wjdy','tfs','fcyhm','gss','ylg','yacs','sls','zgs','jc','ygsk','pygc','dtgc','jsbwg','xxt','hys','bqbhbwg','jzgdm'];
+  const BOX_COLORS = [
+    ["#b5432a","#7a2d1c"],["#1d7f8c","#12545c"],["#a9682f","#6f441d"],["#5c6670","#3b4249"],["#4a4a48","#262624"],
+    ["#2b3f73","#1a2748"],["#2e8b57","#1d5c39"],["#3a6b7d","#254552"],["#c0392b","#7d241b"],["#a67c2e","#6e511c"],
+    ["#8b6b48","#5c4630"],["#9b2d4e","#671d33"],["#c8a05a","#8a6c39"],["#b03a2e","#74251d"],["#4f6d7a","#33474f"],
+    ["#b08a3e","#775c28"],["#c9a227","#8a6e19"],["#2f5d50","#1e3d34"],["#b45f3c","#783e26"],["#8e2f2f","#5d1d1d"]
+  ];
+  const BOX_KEY = "sxgj_blindbox_opened";
+  // 主形象图片文件名与建筑显示名不一致的特例
+  const BOX_FILE = { jsbwg: "晋商博物院" };
+  const openedSet = new Set(JSON.parse(localStorage.getItem(BOX_KEY) || "[]"));
+  const bbGrid = document.getElementById("bbGrid");
+  const bbCnt = document.getElementById("bbCnt");
+  const bbProgress = document.getElementById("bbProgress");
+  function saveBox(){ localStorage.setItem(BOX_KEY, JSON.stringify([...openedSet])); }
+  function updateCnt(){
+    bbCnt.textContent = openedSet.size;
+    bbProgress.classList.toggle("done", openedSet.size >= BOX_ORDER.length);
+  }
+  function popSound(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "triangle"; o.frequency.setValueAtTime(320, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + .18);
+      g.gain.setValueAtTime(.22, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .35);
+      o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + .4);
+    }catch(e){}
+  }
+  function bbConfetti(card, c1){
+    const colors = [c1, "#d4a843", "#f0c85a", "#fff3d6", "#b22222"];
+    for (let i = 0; i < 14; i++){
+      const s = document.createElement("span"); s.className = "bb-confetti";
+      const ang = Math.random() * Math.PI * 2, dist = 50 + Math.random() * 60;
+      s.style.left = "50%"; s.style.top = "42%";
+      s.style.background = colors[i % colors.length];
+      s.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+      s.style.setProperty("--dy", (Math.sin(ang) * dist + 45) + "px");
+      s.style.setProperty("--rot", (Math.random() * 720 - 360) + "deg");
+      card.appendChild(s); setTimeout(() => s.remove(), 1100);
+    }
+  }
+  function buildBox(){
+    bbGrid.innerHTML = "";
+    BOX_ORDER.forEach((id, i) => {
+      const d = S[id]; if (!d) return;
+      const n = String(i + 1).padStart(2, "0");
+      const [c1, c2] = BOX_COLORS[i % BOX_COLORS.length];
+      const card = document.createElement("div");
+      card.className = "bb-card";
+      card.style.setProperty("--c1", c1); card.style.setProperty("--c2", c2);
+      card.innerHTML = `
+        <div class="bb-inner">
+          <div class="bb-glow"></div>
+          <div class="bb-box"></div>
+          <div class="bb-q">?</div>
+          <div class="bb-lid"><div class="bb-bow"></div></div>
+          <div class="bb-num">No.${n}</div>
+          <div class="bb-tag">${d.name}</div>
+          <img class="bb-char" src="sjsc/ipxx/${n}_${BOX_FILE[id] || d.name}_主形象.png" alt="${d.name}" draggable="false">
+          <div class="bb-hint">点击形象 · 进入文创页</div>
+        </div>`;
+      const charImg = card.querySelector(".bb-char");
+      if (openedSet.has(id)){
+        card.classList.add("opened", "pop");
+        charImg.style.transform = "translate(-50%,-50%) scale(1)";
+      }
+      card.addEventListener("click", () => {
+        if (card.classList.contains("opened")){
+          if (card.classList.contains("pop")) location.href = `sjsc/ipxx/w${id}.html`;
+          return;
+        }
+        card.classList.add("shaking");
+        setTimeout(() => {
+          card.classList.remove("shaking"); card.classList.add("opening");
+          setTimeout(() => {
+            card.classList.add("opened", "pop");
+            openedSet.add(id); saveBox(); updateCnt(); popSound(); bbConfetti(card, c1);
+          }, 420);
+        }, 480);
+      });
+      charImg.addEventListener("click", e => {
+        e.stopPropagation();
+        if (card.classList.contains("pop")) location.href = `sjsc/ipxx/w${id}.html`;
+      });
+      bbGrid.appendChild(card);
+    });
+    updateCnt();
+  }
+  document.getElementById("bbReset").addEventListener("click", () => {
+    openedSet.clear(); saveBox(); buildBox();
+    document.querySelector(".blindbox").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  buildBox();
+})();
+</script>
+</body>
+</html>
